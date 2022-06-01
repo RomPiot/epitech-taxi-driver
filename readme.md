@@ -14,3 +14,8 @@
 
 Server is lauched!
 
+
+## Configuration
+python3 src/manage.py startapp nameofffolder
+create your entities
+python3 src/manage.py makemigrations appname
