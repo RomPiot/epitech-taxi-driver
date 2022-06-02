@@ -1,0 +1,278 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Titre
+{% endblock %}
+
+{% block content %}
+	{% if q_learning_best_result %}
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<canvas id="bubbleChart"></canvas>
+	{% else %}
+		<form action="" method="post">
+			{% csrf_token %}
+		{{ form | crispy }}
+			<input class="btn btn-success" type="submit" value="Valider">
+		</form>
+	{% endif %}
+
+	<script>
+		const getOrCreateTooltip = (chart) => {
+			let tooltipEl = chart.canvas.parentNode.querySelector('div');
+		  
+			if (!tooltipEl) {
+			  tooltipEl = document.createElement('div');
+			  tooltipEl.style.background = 'rgba(0, 0, 0, 0.7)';
+			  tooltipEl.style.borderRadius = '3px';
+			  tooltipEl.style.color = 'white';
+			  tooltipEl.style.opacity = 1;
+			  tooltipEl.style.pointerEvents = 'none';
+			  tooltipEl.style.position = 'absolute';
+			  tooltipEl.style.transform = 'translate(-50%, 0)';
+			  tooltipEl.style.transition = 'all .1s ease';
+		  
+			  const table = document.createElement('table');
+			  table.style.margin = '0px';
+		  
+			  tooltipEl.appendChild(table);
+			  chart.canvas.parentNode.appendChild(tooltipEl);
+			}
+		  
+			return tooltipEl;
+		  };
+		  
+		  const externalTooltipHandler = (context) => {
+			// Tooltip Element
+			const {chart, tooltip} = context;
+			const tooltipEl = getOrCreateTooltip(chart);
+		  
+			// Hide if no tooltip
+			if (tooltip.opacity === 0) {
+			  tooltipEl.style.opacity = 0;
+			  return;
+			}
+		  
+			// Set Text
+			if (tooltip.body) {
+			  const titleLines = tooltip.title || [];
+			  const bodyLines = tooltip.body.map(b => b.lines);
+			  const tableBody = document.createElement('tbody');
+			  const defaultName = tooltip.body[0].lines[0].toLowerCase()
+			  let dataToDisplay;
+			 
+			  if (defaultName.includes("deep")) {
+				dataToDisplay = {
+					"title": "Deep Q-Learning",
+					"results": "Résultats",
+					// "AVG Rewards": "{{ q_learning_best_result.avg_rewards }}",
+					// "AVG Steps": "{{ q_learning_best_result.avg_steps }}",
+					// "Duration": "{{ q_learning_best_result.duration }}",
+					"parameters": "Paramètres",
+					// "nb_episodes": parseInt("{{ q_learning_best_result.nb_episodes }}"),
+					// "epsilon_rate": "{{ q_learning_best_result.epsilon_rate }}",
+					// "epsilon_min": "{{ q_learning_best_result.epsilon_min }}",
+					// "epsilon_max": "{{ q_learning_best_result.epsilon_max }}",
+					// "learning_rate": "{{ q_learning_best_result.learning_rate }}",
+					// "reward_discount_rate": "{{ q_learning_best_result.reward_discount_rate }}",
+					// "decay_rate": "{{ q_learning_best_result.decay_rate }}",
+				  }
+			  } else if (defaultName.includes("learning")) {
+				dataToDisplay = {
+					"title": "Q-Learning",
+					"results": "Résultats",
+					"AVG Rewards": "{{ q_learning_best_result.avg_rewards }}",
+					"AVG Steps": "{{ q_learning_best_result.avg_steps }}",
+					"Duration": "{{ q_learning_best_result.duration }}",
+					"parameters": "Paramètres",
+					"nb_episodes": parseInt("{{ q_learning_best_result.nb_episodes }}"),
+					"epsilon_rate": "{{ q_learning_best_result.epsilon_rate }}",
+					"epsilon_min": "{{ q_learning_best_result.epsilon_min }}",
+					"epsilon_max": "{{ q_learning_best_result.epsilon_max }}",
+					"learning_rate": "{{ q_learning_best_result.learning_rate }}",
+					"reward_discount_rate": "{{ q_learning_best_result.reward_discount_rate }}",
+					"decay_rate": "{{ q_learning_best_result.decay_rate }}",
+				}
+			} else if (defaultName.includes("sarsa")) {
+				dataToDisplay = {
+					"title": "Sarsa",
+					"results": "Résultats",
+					// "AVG Rewards": "{{ q_learning_best_result.avg_rewards }}",
+					// "AVG Steps": "{{ q_learning_best_result.avg_steps }}",
+					 //"Duration": "{{ q_learning_best_result.duration }}",
+					 "parameters": "Paramètres",
+					 // "nb_episodes": parseInt("{{ q_learning_best_result.nb_episodes }}"),
+					 // "epsilon_rate": "{{ q_learning_best_result.epsilon_rate }}",
+					 // "epsilon_min": "{{ q_learning_best_result.epsilon_min }}",
+					 // "epsilon_max": "{{ q_learning_best_result.epsilon_max }}",
+					 // "learning_rate": "{{ q_learning_best_result.learning_rate }}",
+					 // "reward_discount_rate": "{{ q_learning_best_result.reward_discount_rate }}",
+					 // "decay_rate": "{{ q_learning_best_result.decay_rate }}",
+				}
+			} else if (defaultName.includes("user")) {
+				dataToDisplay = {
+					"title": "User Parameters",
+					"results": "Résultats",
+					"AVG Rewards": "{{ algo_user_result.avg_rewards }}",
+					"AVG Steps": "{{ algo_user_result.avg_steps }}",
+					"Duration": "{{ algo_user_result.duration }}",
+					"parameters": "Paramètres",
+					"nb_episodes": parseInt("{{ algo_user_result.nb_episodes }}"),
+					"epsilon_rate": "{{ algo_user_result.epsilon_rate }}",
+					"epsilon_min": "{{ algo_user_result.epsilon_min }}",
+					"epsilon_max": "{{ algo_user_result.epsilon_max }}",
+					"learning_rate": "{{ algo_user_result.learning_rate }}",
+					"reward_discount_rate": "{{ algo_user_result.reward_discount_rate }}",
+					"decay_rate": "{{ algo_user_result.decay_rate }}",
+				}
+			}
+
+			  bodyLines.forEach((body, i) => {
+				const colors = tooltip.labelColors[i];
+		  		  
+				for (var key in dataToDisplay) {
+				const tr = document.createElement('tr');
+				tr.style.backgroundColor = 'inherit';
+				tr.style.borderWidth = 0;
+				
+				if (key == "title") {
+					tr.style.fontWeight = 'bold';
+				} else if (key == "parameters" || key == "results") {
+					tr.style.color = colors.backgroundColor;
+					tr.style.fontWeight = 'bold';
+				} else {
+					tr.style.fontSize = '14px';
+				}
+		  
+				const td = document.createElement('td');
+				td.style.borderWidth = 0;
+		  
+				let theText;
+				if (key == "title" || key == "parameters" || key == "results") {
+					theText = dataToDisplay[key];
+				} else {
+					theText = key + " : " + dataToDisplay[key]
+				}
+				const text = document.createTextNode(theText);
+
+		  
+				td.appendChild(text);
+				tr.appendChild(td);
+				tableBody.appendChild(tr);
+			};
+				
+			  });
+		  
+			  const tableRoot = tooltipEl.querySelector('table');
+		  
+			  // Remove old children
+			  while (tableRoot.firstChild) {
+				tableRoot.firstChild.remove();
+			  }
+		  
+			  // Add new children
+			  tableRoot.appendChild(tableBody);
+			}
+		  
+			const {offsetLeft: positionX, offsetTop: positionY} = chart.canvas;
+		  
+			// Display, position, and set styles for font
+			tooltipEl.style.opacity = 1;
+			tooltipEl.style.left = positionX + tooltip.caretX + 'px';
+			tooltipEl.style.top = positionY + tooltip.caretY + 'px';
+			tooltipEl.style.font = tooltip.options.bodyFont.string;
+			tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+		  };
+		  
+		const data = {
+			datasets: [{
+				label: 'Q-Learning',
+				data: [{
+					x: parseFloat("{{ q_learning_best_result.avg_rewards }}".replace(/,/g, '.')),
+					y: parseFloat("{{ q_learning_best_result.avg_steps }}".replace(/,/g, '.')),
+					r: 10
+				}],
+				backgroundColor: "#F20000",
+				hoverBackgroundColor: "#F20000"
+			}, {
+				label: 'Deep Q-Learning',
+				data: [{
+					x: 5.6,
+					y: 13.8,
+					r: 10
+				}],
+				backgroundColor: "#44e4ee",
+				hoverBackgroundColor: "#44e4ee"
+			}, {
+				label: 'Sarsa',
+				data: [{
+					x: 6.4,
+					y: 13.2,
+					r: 10
+				}],
+				backgroundColor: "#FF00FF",
+				hoverBackgroundColor: "#FF00FF"
+			}, {
+				label: 'User Parameters',
+				data: [{
+					x: parseFloat("{{ algo_user_result.avg_rewards }}".replace(/,/g, '.')),
+					y: parseFloat("{{ algo_user_result.avg_steps }}".replace(/,/g, '.')),
+					r: 10
+				}],
+				backgroundColor: "#00D900",
+				hoverBackgroundColor: "#00D900"
+			}]
+		};
+
+		const config = {
+			type: 'bubble',
+			data: data,
+			options: {
+				plugins: {
+					title: {
+					  display: true,
+					  text: 'Graphique comparatif des différents algos', font: {
+						size: 18,
+						weight: "bold"
+					}
+					},
+					tooltip: {
+					  enabled: false,
+					  position: 'nearest',
+					  external: externalTooltipHandler
+					}
+				  },
+				  scales: {
+					y: {
+						title: {
+						  display: true,
+						  text: 'AVG Steps',
+						  font: {
+							  size: 14,
+							  weight: "bold"
+						  }
+						}
+					  },
+					 x: {
+						title: {
+						  display: true,
+						  text: 'AVG Rewards',
+						  font: {
+							size: 14,
+							weight: "bold"
+						}
+						}
+					  }
+				}
+			},
+			  
+		  };
+
+		const myChart = new Chart(
+			document.getElementById('bubbleChart'),
+			config
+		);
+
+		
+</script>
+
+{% endblock %}
