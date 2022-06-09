@@ -30,7 +30,7 @@ class QLearning:
         learning_rate=0.02,
         reward_discount_rate=0.618,
         decay_rate=0.01,
-        episodes=100000,
+        episodes=10000,
         max_steps=99,
         training=True,
         reset=False,
@@ -42,76 +42,84 @@ class QLearning:
         total_steps = []
         total_rewards = []
 
-        if reset:
-            q_table = np.zeros((self.states, self.actions))
+        if episodes > 0:
 
-        done = False
+            if reset:
+                q_table = np.zeros((self.states, self.actions))
 
-        if show_print:
-            if training:
-                print("")
-                print("---------------------- TRAINING ----------------------")
-            else:
-                print("")
-                print("---------------------- TESTING ----------------------")
-
-        for episode in range(episodes):
-            environment.reset()
-            state = 0
-            total_episode_rewards = 0
-            total_episode_steps = 0
             done = False
 
-            for step in range(max_steps):
-                # epsilon-greedy
-                if training and random() < epsilon:  # Exploration
-                    action = environment.action_space.sample()  # get random action
+            if show_print:
+                if training:
+                    print("")
+                    print("---------------------- TRAINING ----------------------")
+                else:
+                    print("")
+                    print("---------------------- TESTING ----------------------")
 
-                else:  # Exploitation
-                    possibilities = q_table[state, :]  # possibilities from current state
-                    action = np.argmax(possibilities)  # get the best direction depending on the reward value
+            for episode in range(episodes):
+                environment.reset()
+                state = 0
+                total_episode_rewards = 0
+                total_episode_steps = 0
+                done = False
 
-                # Move to direction
-                next_state, reward, done, info = environment.step(action)
+                for step in range(max_steps):
+                    # epsilon-greedy
+                    if training and random() < epsilon:  # Exploration
+                        action = environment.action_space.sample()  # get random action
+
+                    else:  # Exploitation
+                        possibilities = q_table[state, :]  # possibilities from current state
+                        action = np.argmax(possibilities)  # get the best direction depending on the reward value
+
+                    # Move to direction
+                    next_state, reward, done, info = environment.step(action)
+
+                    if training:
+                        # Update Q table with value function
+                        # V(s) = V(s) + (lr x (V(s') - V(s)))
+                        # state_value = state_value + alpha x (reward + gamma x next_state_value - state_value)
+                        q_table[state, action] = q_table[state, action] + learning_rate * (
+                            reward + reward_discount_rate * np.max(q_table[next_state, :]) - q_table[state, action]
+                        )
+
+                    state = next_state
+                    total_episode_steps = step + 1
+
+                    # Update statistics
+                    total_episode_rewards += reward
+
+                    if done:
+                        total_rewards.append(total_episode_rewards)
+                        won_episode += 1
+                        break
+
+                # game is ended
+                total_steps.append(total_episode_steps)
+
+                # epsilon decay to maintain trade-off between exploration-exploitation
+                epsilon = epsilon_min + (epsilon_max - epsilon_min) * np.exp(-decay_rate * episode)
+
+            total_time = time.process_time() - t
+            avg_rewards = round(sum(total_rewards) / len(total_rewards) if len(total_rewards) > 0 else 0, 2)
+            avg_steps = round(sum(total_steps) / len(total_steps) if len(total_steps) > 0 else 0, 2)
+            won_rate = round(won_episode / episodes * 100 if won_episode > 0 else 0, 2)
+            duration = round(total_time if total_time > 0 else 0, 2)
+
+            if show_print:
+                print(f"Total episodes : {episodes}")
+                print(f"Average rewards : {avg_rewards}")
+                print(f"Average steps : {avg_steps}")
+                print(f"Won episode : {won_episode} ({won_rate}%)")
 
                 if training:
-                    # Update Q table with value function
-                    # V(s) = V(s) + (lr x (V(s') - V(s)))
-                    # state_value = state_value + alpha x (reward + gamma x next_state_value - state_value)
-                    q_table[state, action] = q_table[state, action] + learning_rate * (
-                        reward + reward_discount_rate * np.max(q_table[next_state, :]) - q_table[state, action]
-                    )
+                    print(f"Training time : {duration} seconds")
 
-                state = next_state
-                total_episode_steps = step + 1
-
-                # Update statistics
-                total_episode_rewards += reward
-
-                if done:
-                    total_rewards.append(total_episode_rewards)
-                    won_episode += 1
-                    break
-
-            # game is ended
-            total_steps.append(total_episode_steps)
-
-            # epsilon decay to maintain trade-off between exploration-exploitation
-            epsilon = epsilon_min + (epsilon_max - epsilon_min) * np.exp(-decay_rate * episode)
-
-        avg_rewards = round(sum(total_rewards) / len(total_rewards), 2)
-        avg_steps = round(sum(total_steps) / len(total_steps), 2)
-        won_rate = round(won_episode / episodes * 100, 2)
-        duration = round(time.process_time() - t, 2)
-
-        if show_print:
-            print(f"Total episodes : {episodes}")
-            print(f"Average rewards : {avg_rewards}")
-            print(f"Average steps : {avg_steps}")
-            print(f"Won episode : {won_episode} ({won_rate}%)")
-
-            if training:
-                print(f"Training time : {duration} seconds")
+        avg_rewards = avg_rewards if "avg_rewards" in locals() else 0
+        avg_steps = avg_steps if "avg_steps" in locals() else 0
+        duration = duration if "duration" in locals() else 0
+        won_rate = won_rate if "won_rate" in locals() else 0
 
         return {
             "q_table": q_table,
@@ -179,6 +187,3 @@ class QLearning:
         )
 
         return result_testing
-
-
-# taxi()

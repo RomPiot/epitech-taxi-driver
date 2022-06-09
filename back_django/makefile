@@ -46,6 +46,8 @@ superadmin:
 clear_cache: 
 	sudo python3 src/manage.py clean_pyc
 
-
 settings: 
 	python3 src/manage.py print_settings
+
+test:
+	python3 src/manage.py test t_aia_902.tests 
