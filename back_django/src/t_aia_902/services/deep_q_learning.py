@@ -88,6 +88,12 @@ class DeepQLearning:
         }
 
 
+# module_dir = os.path.dirname(__file__)  # get current directory
+# filename_1 = os.path.join(module_dir, "../data/saved_model/trained_200000.h5")
+# filename_2 = os.path.join(module_dir, "../data/saved_model/trained_200000.h5")
+# test_1 = load_DeepRl(filename_1)
+# test_2 = load_DeepRl(filename_)
+
 # # NB_CUSTOM = 100000
 # # Lancer un nombre custom:
 # # launch_DeepRl(NB_CUSTOM)
