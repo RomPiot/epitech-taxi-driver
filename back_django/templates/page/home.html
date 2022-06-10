@@ -64,18 +64,12 @@
 				dataToDisplay = {
 					"title": "Deep Q-Learning",
 					"results": "Résultats",
-					// "AVG Rewards": "{{ q_learning_best_result.avg_rewards }}",
-					// "AVG Steps": "{{ q_learning_best_result.avg_steps }}",
-					// "Duration": "{{ q_learning_best_result.duration }}",
+					"AVG Rewards": "{{ deep_q_learning_best_result.avg_rewards }}",
+					"AVG Steps": "{{ deep_q_learning_best_result.avg_steps }}",
+					"Duration": "{{ deep_q_learning_best_result.duration }}",
 					"parameters": "Paramètres",
-					// "nb_episodes": parseInt("{{ q_learning_best_result.nb_episodes }}"),
-					// "epsilon_rate": "{{ q_learning_best_result.epsilon_rate }}",
-					// "epsilon_min": "{{ q_learning_best_result.epsilon_min }}",
-					// "epsilon_max": "{{ q_learning_best_result.epsilon_max }}",
-					// "learning_rate": "{{ q_learning_best_result.learning_rate }}",
-					// "reward_discount_rate": "{{ q_learning_best_result.reward_discount_rate }}",
-					// "decay_rate": "{{ q_learning_best_result.decay_rate }}",
-				  }
+					"nb_episodes": parseInt("{{ deep_q_learning_best_result.nb_episodes }}"),
+				}
 			  } else if (defaultName.includes("learning")) {
 				dataToDisplay = {
 					"title": "Q-Learning",
@@ -96,19 +90,31 @@
 				dataToDisplay = {
 					"title": "Sarsa",
 					"results": "Résultats",
-					// "AVG Rewards": "{{ q_learning_best_result.avg_rewards }}",
-					// "AVG Steps": "{{ q_learning_best_result.avg_steps }}",
-					 //"Duration": "{{ q_learning_best_result.duration }}",
+					"AVG Rewards": "{{ sarsa_best_result.avg_rewards }}",
+					"AVG Steps": "{{ sarsa_best_result.avg_steps }}",
+					 "Duration": "{{ sarsa_best_result.duration }}",
 					 "parameters": "Paramètres",
-					 // "nb_episodes": parseInt("{{ q_learning_best_result.nb_episodes }}"),
-					 // "epsilon_rate": "{{ q_learning_best_result.epsilon_rate }}",
-					 // "epsilon_min": "{{ q_learning_best_result.epsilon_min }}",
-					 // "epsilon_max": "{{ q_learning_best_result.epsilon_max }}",
-					 // "learning_rate": "{{ q_learning_best_result.learning_rate }}",
-					 // "reward_discount_rate": "{{ q_learning_best_result.reward_discount_rate }}",
-					 // "decay_rate": "{{ q_learning_best_result.decay_rate }}",
+					 "nb_episodes": parseInt("{{ sarsa_best_result.nb_episodes }}"),
+					 "epsilon_rate": "{{ sarsa_best_result.epsilon_rate }}",
+					 "epsilon_min": "{{ sarsa_best_result.epsilon_min }}",
+					 "epsilon_max": "{{ sarsa_best_result.epsilon_max }}",
+					 "learning_rate": "{{ sarsa_best_result.learning_rate }}",
+					 "reward_discount_rate": "{{ sarsa_best_result.reward_discount_rate }}",
+					 "decay_rate": "{{ sarsa_best_result.decay_rate }}",
 				}
 			} else if (defaultName.includes("user")) {
+				// TODO : check user algo type 
+				{% if algo_selected == "deep-q-learning" %}
+				dataToDisplay = {
+					"title": "User Parameters",
+					"results": "Résultats",
+					"AVG Rewards": "{{ algo_user_result.avg_rewards }}",
+					"AVG Steps": "{{ algo_user_result.avg_steps }}",
+					"Duration": "{{ algo_user_result.duration }}",
+					"parameters": "Paramètres",
+					"nb_episodes": parseInt("{{ algo_user_result.nb_episodes }}"),
+					}
+				{% else %}
 				dataToDisplay = {
 					"title": "User Parameters",
 					"results": "Résultats",
@@ -124,6 +130,7 @@
 					"reward_discount_rate": "{{ algo_user_result.reward_discount_rate }}",
 					"decay_rate": "{{ algo_user_result.decay_rate }}",
 				}
+				{% endif %}
 			}
 
 			  bodyLines.forEach((body, i) => {
@@ -196,8 +203,8 @@
 			}, {
 				label: 'Deep Q-Learning',
 				data: [{
-					x: 5.6,
-					y: 13.8,
+					x: parseFloat("{{ deep_q_learning_best_result.avg_rewards }}".replace(/,/g, '.')),
+					y: parseFloat("{{ deep_q_learning_best_result.avg_steps }}".replace(/,/g, '.')),
 					r: 10
 				}],
 				backgroundColor: "#44e4ee",
@@ -205,8 +212,8 @@
 			}, {
 				label: 'Sarsa',
 				data: [{
-					x: 6.4,
-					y: 13.2,
+					x: parseFloat("{{ sarsa_best_result.avg_rewards }}".replace(/,/g, '.')),
+					y: parseFloat("{{ sarsa_best_result.avg_steps }}".replace(/,/g, '.')),
 					r: 10
 				}],
 				backgroundColor: "#FF00FF",
