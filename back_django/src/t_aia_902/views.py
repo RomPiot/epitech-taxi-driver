@@ -1,12 +1,10 @@
-from pprint import pprint
 from django.shortcuts import render, redirect
-
 from .forms.deep_qlearning_params import DeepQLearningParamsForm
 from .services.deep_q_learning import DeepQLearning
-
+from .services.sarsa import Sarsa
+from .services.q_learning import QLearning
 from .forms.qlearning_params import QLearningParamsForm
 from .forms.select_algo import SelectAlgoForm
-from .services.q_learning import QLearning
 import pandas as pd
 import os
 
@@ -52,10 +50,9 @@ def algo_params(request, algo_selected):
 
         if form.is_valid():
             file_path = os.path.join(module_dir, "data/q-learning.csv")
-            qlearning_data = pd.read_csv(filepath_or_buffer=file_path, delimiter=",", encoding="utf-8", header=0)
+            qlearning_data = pd.read_csv(filepath_or_buffer=file_path, delimiter=";", encoding="utf-8", header=0)
             qlearning_data = qlearning_data.sort_values(by=["avg_rewards"], ascending=[False]).reset_index(drop=True)
             q_learning_best_row = qlearning_data.iloc[0]
-            q_learning_best_row["duration"] = 7.5
 
             q_learning_best_result = {
                 "avg_rewards": q_learning_best_row["avg_rewards"],
@@ -71,12 +68,10 @@ def algo_params(request, algo_selected):
             }
 
             # SARSA
-            # TODO : change path file
-            file_path = os.path.join(module_dir, "data/q-learning.csv")
+            file_path = os.path.join(module_dir, "data/sarsa.csv")
             sarsa_data = pd.read_csv(filepath_or_buffer=file_path, delimiter=",", encoding="utf-8", header=0)
             sarsa_data = sarsa_data.sort_values(by=["avg_rewards"], ascending=[False]).reset_index(drop=True)
             sarsa_best_row = sarsa_data.iloc[0]
-            sarsa_best_row["duration"] = 7.5
 
             sarsa_best_result = {
                 "avg_rewards": sarsa_best_row["avg_rewards"],
@@ -140,8 +135,7 @@ def algo_params(request, algo_selected):
                     "nb_episodes": form.data["nb_episodes"],
                 }
             elif algo_selected == "sarsa":
-                # TODO : change class to use
-                algo_user_params = QLearning().taxi(
+                algo_user_params = Sarsa().taxi(
                     nb_episodes=int(form.data["nb_episodes"]),
                     epsilon_rate=float(form.data["epsilon_rate"]),
                     epsilon_min=float(form.data["epsilon_min"]),
