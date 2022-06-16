@@ -29,16 +29,6 @@ def algo_params(request, algo_selected):
     context = {}
     module_dir = os.path.dirname(__file__)  # get current directory
 
-    # file_to_load_1 = os.path.join(module_dir, "data/saved_model/trained_500000.h5")
-    # deep_q_learning_best_row_2 = load_DeepRl(file_to_load_1, 50)
-    # pprint(deep_q_learning_best_row_2)
-
-    # file_to_load_2 = os.path.join(module_dir, "data/saved_model/trained_1000000.h5")
-    # deep_q_learning_best_row_2 = load_DeepRl(file_to_load_2, 50)
-    # pprint(deep_q_learning_best_row_2)
-
-    # return
-
     if algo_selected == "q-learning":
         form = QLearningParamsForm(request.POST)
     elif algo_selected == "deep-q-learning":

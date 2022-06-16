@@ -50,4 +50,8 @@ settings:
 	python3 src/manage.py print_settings
 
 test:
-	python3 src/manage.py test t_aia_902.tests 
+	coverage erase
+	coverage run src/manage.py test t_aia_902 
+
+coverage:
+	coverage report -i
