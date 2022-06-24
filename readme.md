@@ -1,6 +1,6 @@
 ## Installation
-1. Open folder in WSL
-2. in root project
+1. Open folder in WSL (or linux)
+2. in root project<br>
 ```cp .env.example .env```
 3. in .env file, change the path value of SQLITE_PATH
 4. ```cd back_django```
@@ -15,7 +15,8 @@
 Server is lauched!
 
 
-## Configuration
-python3 src/manage.py startapp nameofffolder
-create your entities
-python3 src/manage.py makemigrations appname
+## Tests
+1. To run tests
+```make test```
+2. To show coverage 
+```make coverage```

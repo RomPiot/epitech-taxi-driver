@@ -108,7 +108,7 @@ class QlearningTestCase(TestCase):
         self.assertEqual(type(qlearning_data), dict)
         self.assertEqual(qlearning_data["avg_rewards"] > 0, True)
         self.assertEqual(qlearning_data["avg_steps"] < 80, True)
-        self.assertEqual(qlearning_data["duration"] < 15, True)
+        self.assertEqual(qlearning_data["duration"] < 30, True)
         self.assertEqual(np.array_equal(qlearning_data["q_table"], qlearning_empty_qtable), False)
 
     def test_qlearning_taxi_user_method_good_training(self):
