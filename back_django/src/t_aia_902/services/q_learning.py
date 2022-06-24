@@ -187,3 +187,10 @@ class QLearning:
         )
 
         return result_testing
+
+
+ql = QLearning()
+training = ql.play_to_taxi(q_table=QLearning.q_table, environment=QLearning.env, show_print=True)
+result = ql.play_to_taxi(q_table=training["q_table"], environment=QLearning.env, show_print=True)
+
+print(result)
