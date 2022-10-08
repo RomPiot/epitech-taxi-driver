@@ -55,3 +55,6 @@ test:
 
 coverage:
 	coverage report -i
+
+functional_test:
+	python3 src/manage.py test t_aia_902.tests.FunctionalTestCase
